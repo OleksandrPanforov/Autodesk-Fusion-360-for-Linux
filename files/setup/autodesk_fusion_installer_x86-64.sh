@@ -175,7 +175,7 @@ check_required_packages() {
     firefox_version=$(get_firefox_version)
 
     # Check if Firefox is installed via Snap and prompt user to install DEB version
-    check_install_firefox_deb
+    # check_install_firefox_deb
 }
 
 ##############################################################################################################################################################################
