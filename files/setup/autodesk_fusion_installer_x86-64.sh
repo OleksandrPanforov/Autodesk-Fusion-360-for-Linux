@@ -651,62 +651,6 @@ get_firefox_version() {
     fi
 }
 
-is_snap_firefox_installed() {
-    if snap list | grep -q firefox; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-check_install_firefox_deb() {
-    # Function to check if Firefox is installed via Snap
-    is_snap_firefox_installed {
-        snap list firefox &> /dev/null
-        return $?
-    }
-
-    # Check if Firefox is installed via Snap
-    if is_snap_firefox_installed; then
-        echo "The installed version of Firefox is from Snap."
-        echo "It is recommended to install the DEB version for better performance and compatibility."
-
-        # Prompt user for action
-        read -p "Do you want to uninstall the Snap version of Firefox and install the DEB version? (y/n): " choice
-
-        if [[ "$choice" =~ ^[Yy]$ ]]; then
-            echo "Proceeding with the uninstallation of the Snap version and installation of the DEB version..."
-
-            # Uninstall Firefox Snap
-            sudo snap remove -y firefox
-
-            # Create an APT keyring directory if it doesn't exist
-            sudo install -d -m 0755 /etc/apt/keyrings
-
-            # Import the Mozilla APT repo signing key
-            wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
-
-            # Add Mozilla APT repo to sources.list
-            echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | sudo tee /etc/apt/sources.list.d/mozilla.list > /dev/null
-
-            # Set package priority to ensure DEB version is default
-            echo '
-Package: *
-Pin: origin packages.mozilla.org
-Pin-Priority: 1000
-' | sudo tee /etc/apt/preferences.d/mozilla
-
-            # Update and install Firefox DEB version
-            sudo apt update && sudo apt install -y firefox
-
-            echo "Firefox DEB version installed successfully."
-        else
-            echo "No changes made. Firefox Snap version remains installed."
-        fi
-    else
-        echo "The installed version of Firefox is not from Snap."
-    fi
-}
 
 ##############################################################################################################################################################################
 # DOWNLOAD THE REQUIRED FILES FOR THE INSTALLER:                                                                                                                             #
